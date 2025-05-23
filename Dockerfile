@@ -13,8 +13,13 @@ RUN apt-get update && apt-get install -y \
 COPY app.py .
 COPY best.onnx .
 
-# 필요한 패키지 설치
-RUN pip install --no-cache-dir flask onnxruntime numpy opencv-python pillow
+# 의존성 설치
+RUN pip install --no-cache-dir \
+    flask \
+    onnxruntime \
+    numpy \
+    opencv-python \
+    pillow
 
 # 서버 실행
 CMD ["python", "app.py"]
