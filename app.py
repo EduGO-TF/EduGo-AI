@@ -22,34 +22,26 @@ def preprocess(img):
 
 # 후처리: 응답 포맷에 맞게
 def postprocess(output, conf_threshold=0.25):
-    detections = output[0]
+    detections = output[0][0]  # shape: (25200, 6)
     results = []
 
     for det in detections:
-        try:
-            # confidence 값 추출
-            confidence = det[4]
-            if isinstance(confidence, (np.ndarray, list)):
-                confidence = float(confidence[0])
-            else:
-                confidence = float(confidence)
+        x1, y1, x2, y2, confidence, class_id = det
 
-            # class label 추출
-            label = det[5]
-            if isinstance(label, (np.ndarray, list)):
-                label = int(label[0])
-            else:
-                label = int(label)
+        if confidence > conf_threshold:
+            x_center = (x1 + x2) / 2
+            y_center = (y1 + y2) / 2
+            width = x2 - x1
+            height = y2 - y1
 
-            if confidence > conf_threshold:
-                results.append({
-                    "x": label,
-                    "y": round(confidence, 2),
-                    "cookie_image": ""
-                })
-        except Exception as e:
-            print(f"예외 발생 (무시): {e}")
-            continue
+            results.append({
+                "class_id": int(class_id),
+                "x_center": round(float(x_center), 6),
+                "y_center": round(float(y_center), 6),
+                "width": round(float(width), 6),
+                "height": round(float(height), 6),
+                "confidence": round(float(confidence), 4)
+            })
 
     return results
 
